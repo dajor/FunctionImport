@@ -1,0 +1,7 @@
+pool:
+  vmImage: 'ubuntu-16.04' # other options: 'macOS-10.13', 'vs2017-win2016'
+
+- script: | 
+    docker build -t $(dockerId)/$(imageName) .  # add options to this command to meet your needs
+    docker login -u $(dockerId) -p $(pswd) $(dockerId).azurecr.io
+    docker push $(dockerId).azurecr.io/$(imageName)
