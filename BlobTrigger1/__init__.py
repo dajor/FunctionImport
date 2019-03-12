@@ -11,6 +11,9 @@ import csv
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.errors as errors
 
+from dateutil.parser import parse
+
+from azure.storage.blob import BlockBlobService
 
 config = {
     'ENDPOINT': os.environ['ENDPOINT'],
@@ -49,7 +52,22 @@ def main(myblob: func.InputStream):
         logging.info("Import")
         item = json.dumps(item).replace('null', '""')
         item = json.loads(item)
+        
+
+        logging.info(item.get('CREATEDATE'))
+   
+        if item.get('CREATEDATE') is not None:
+            date = parse(item['CREATEDATE'])
+            logging.info(date)
+            item['CREATEDATE'] = date.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+
+        item['id'] = item['CONTRACT_ID']
+
+
         logging.info(json.dumps(item,indent=2))
+
 
         try:
             logging.info ("Try to create the data....")
@@ -84,13 +102,13 @@ def main(myblob: func.InputStream):
 
     df=pd.read_json(out)
     
-    df.to_csv('results.csv')
+    df.to_csv('1results.csv')
     
 
         # Upload the created file, use local_file_name for the blob name
     block_blob_service = BlockBlobService(account_name=os.environ['account_name'], account_key=os.environ['account_key']) 
 
-    block_blob_service.create_blob_from_path('transferin',  'results.csv', 'results.csv')
+    block_blob_service.create_blob_from_path('transferin',  '1results.csv', '1results.csv')
     #create_blob_from_path('transferin', output, '/results.csv')
     
 
